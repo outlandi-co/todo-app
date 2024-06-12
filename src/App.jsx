@@ -1,24 +1,32 @@
-import { useContext } from 'react'
+// App.jsx
+import React from 'react';
+import { MantineProvider } from '@mantine/core';
+import SettingsProvider from '../src/context/Settings';
+import Todo from '../src/components/Todo';
+// Import MantineButton component if it exists
+// import MantineButton from './components/Todo/MantineComponents/MantineButton'; 
+import '@mantine/core/styles.css';
+import '../src/site.scss';
 
-import { SettingsContext } from './context/Settings.jsx';
-import Header from '../src/components/Header.jsx';
-import Footer from '../src/components/Footer.jsx';
-import Counter from './context/Counter.jsx';
-
-
-function App() {
-
-  const settings = useContext(SettingsContext);
-
-  return (
-    <>
-      <div id="app" className={settings.mode}>
-        <Header />
-        <Counter />
-        <Footer />
-      </div>
-    </>
-  )
+export default class App extends React.Component {
+  render() {
+    return (
+      <SettingsProvider>
+        <MantineProvider>
+          <div>
+            <h1>Customized Mantine Button</h1>
+            {/* Render MantineButton if imported */}
+            {/* {MantineButton && <MantineButton
+              variant="filled"
+              color="teal"
+              size="lg"
+              radius="md"
+              label="Click me"
+            />} */}
+          </div>
+          <Todo />
+        </MantineProvider>
+      </SettingsProvider>
+    );
+  }
 }
-
-export default App
