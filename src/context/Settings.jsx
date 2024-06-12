@@ -1,24 +1,35 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'; // Import PropTypes
 
 export const SettingsContext = React.createContext();
 
 function SettingsProvider(props) {
-  const [title, setTitle] = useState('Context API');
-  const [mode, setMode] = useState('light');
+  const defaults = {
+    showCompleted: false,
+    difficulty: 4,
+    perPage: 3,
+  };
 
-  function toggleMode() {
-    setMode(mode === 'light' ? 'dark' : 'light');
+  const [settings, setSettings] = useState(defaults);
+
+  function toggleShowCompleted() {
+    setSettings({ ...settings, showCompleted: !settings.showCompleted });
   }
 
+  function setPerPage(value) {
+    setSettings({ ...settings, perPage: value });
+  }
+
+  const providedValues = { settings, toggleShowCompleted, setPerPage };
+
   return (
-    <SettingsContext.Provider value={{ title, setTitle, mode, toggleMode }}>
+    <SettingsContext.Provider value={providedValues}>
       {props.children}
     </SettingsContext.Provider>
   );
 }
 
-// PropTypes validation
+// Add prop validation for 'children'
 SettingsProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
