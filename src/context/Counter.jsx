@@ -1,16 +1,29 @@
-import { useContext } from 'react';
-import { CounterContext } from './Counter'; // Update import path
+import React, {useState} from 'react';
 
-function Counter() {
-  const counter = useContext(CounterContext);
+export const CounterContext = React.createContext();
+
+
+function CounterProvider(props) {
+
+  const [count, setCount] = useState(0);
+  const [numChanges, setNumChanges] = useState(0);
+
+  function increment() {
+    setCount(count + 1);
+    setNumChanges(numChanges + 1);
+  }
+
+  function decrement() {
+    setCount(count - 1);
+    setNumChanges(numChanges + 1);
+  }
 
   return (
-    <div id="counter">
-      <button onClick={counter.decrement}>-</button>
-      <span>{counter.count}</span>
-      <button onClick={counter.increment}>+</button>
-    </div>
+    <CounterContext.Provider value={{count, increment, decrement, numChanges}}>
+      {props.children}
+    </CounterContext.Provider>
   );
+
 }
 
-export default Counter;
+export default CounterProvider;
