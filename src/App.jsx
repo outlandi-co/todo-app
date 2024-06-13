@@ -1,32 +1,24 @@
-// App.jsx
+// src/App.jsx
 import React from 'react';
-import { MantineProvider } from '@mantine/core';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Todo from '../src/components/Todo/Todo';
+import Settings from '../src/context/Settings';
+import Header from '../src/components/Header/Header';
 import SettingsProvider from '../src/context/Settings';
-import Todo from '../src/components/Todo';
-// Import MantineButton component if it exists
-// import MantineButton from './components/Todo/MantineComponents/MantineButton'; 
-import '@mantine/core/styles.css';
-import '../src/site.scss';
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <SettingsProvider>
-        <MantineProvider>
-          <div>
-            <h1>Customized Mantine Button</h1>
-            {/* Render MantineButton if imported */}
-            {/* {MantineButton && <MantineButton
-              variant="filled"
-              color="teal"
-              size="lg"
-              radius="md"
-              label="Click me"
-            />} */}
-          </div>
-          <Todo />
-        </MantineProvider>
-      </SettingsProvider>
-    );
-  }
-}
+const App = () => {
+  return (
+    <SettingsProvider>
+      <Router>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Todo />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+        <footer>@2024 Qilin Xie</footer>
+      </Router>
+    </SettingsProvider>
+  );
+};
+
+export default App;
