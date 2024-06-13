@@ -1,21 +1,20 @@
-// eslint-disable-next-line no-unused-vars
+// src/components/Todo/Todo.jsx
 import React, { useEffect, useState, useContext } from 'react';
 import { Pagination } from '@mantine/core';
 import useForm from '../../hooks/form';
-
 import { v4 as uuid } from 'uuid';
-
 import { SettingsContext } from '../../context/Settings';
-
-import Header from '../Header';
+import Header from '../Header/Header';
 import Form from '../Form';
+import List from '../List';
+import Auth from '../Auth';
 
 const Todo = () => {
-
   const context = useContext(SettingsContext);
   const defaultValues = context.settings;
 
   const [list, setList] = useState([]);
+  const [displayList, setDisplayList] = useState([]);
   const [incomplete, setIncomplete] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const { handleChange, handleSubmit } = useForm(addItem, defaultValues);
@@ -23,37 +22,53 @@ const Todo = () => {
   function addItem(item) {
     item.id = uuid();
     item.complete = false;
-    console.log(item);
     setList([...list, item]);
   }
 
-  useEffect(() => {
+  function deleteItem(id) {
+    const items = list.filter(item => item.id !== id);
+    setList(items);
+  }
 
+  function toggleComplete(id) {
+    const items = list.map(item => {
+      if (item.id === id) {
+        item.complete = !item.complete;
+      }
+      return item;
+    });
+
+    setList(items);
+  }
+
+  useEffect(() => {
     let filteredList = list.filter(item => {
       return defaultValues.showCompleted ? true : item.complete === false;
     });
 
+    let start = defaultValues.perPage * (currentPage - 1);
+    let end = start + defaultValues.perPage;
 
-    // let's assume this was intentional, displaying the list
-    setIncomplete(filteredList.length);
+    setDisplayList(filteredList.slice(start, end));
 
-    document.title = `To Do List: ${filteredList.length}`;
+    let incompleteCount = filteredList.length;
+    setIncomplete(incompleteCount);
 
+    document.title = `To Do List: ${incompleteCount}`;
   }, [list, currentPage, defaultValues]);
 
   let numPages = Math.ceil(incomplete / defaultValues.perPage);
 
   return (
     <>
-
       <Header openItems={incomplete} />
-
-      <Form handleChange={handleChange} handleSubmit={handleSubmit} difficulty={defaultValues.difficulty} />
-
-      {/* Removed List component */}
-
+      <Auth capability="create">
+        <Form handleChange={handleChange} handleSubmit={handleSubmit} difficulty={defaultValues.difficulty} />
+      </Auth>
+      <Auth capability="read">
+        <List list={displayList} toggleComplete={toggleComplete} deleteItem={deleteItem} />
+      </Auth>
       <Pagination total={numPages} onChange={setCurrentPage} size="lg" radius="lg" withEdges />
-
     </>
   );
 };
