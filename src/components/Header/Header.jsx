@@ -2,16 +2,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function Header(props) {
+const Header = ({ openItems }) => {
   return (
-    <header>
-      <h1>To Do List: {props.openItems} pending</h1>
-    </header>
+    <div>
+      <h1>Header Component</h1>
+      <p>Open Items: {openItems}</p>
+    </div>
   );
-}
+};
 
 Header.propTypes = {
-  openItems: PropTypes.number.isRequired, // Ensure openItems is expected as a number
+  openItems: PropTypes.number.isRequired, // Ensure openItems is required and must be a number
 };
 
 export default Header;

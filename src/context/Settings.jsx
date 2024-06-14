@@ -1,9 +1,10 @@
+// src/context/Settings.jsx
 import React, { useState } from 'react';
-import PropTypes from 'prop-types'; // Import PropTypes
+import PropTypes from 'prop-types';
 
 export const SettingsContext = React.createContext();
 
-function SettingsProvider(props) {
+const SettingsProvider = ({ children }) => {
   const defaults = {
     showCompleted: false,
     difficulty: 4,
@@ -12,24 +13,23 @@ function SettingsProvider(props) {
 
   const [settings, setSettings] = useState(defaults);
 
-  function toggleShowCompleted() {
-    setSettings({ ...settings, showCompleted: !settings.showCompleted });
-  }
+  const toggleShowCompleted = () => {
+    setSettings((prevSettings) => ({ ...prevSettings, showCompleted: !prevSettings.showCompleted }));
+  };
 
-  function setPerPage(value) {
-    setSettings({ ...settings, perPage: value });
-  }
+  const setPerPage = (value) => {
+    setSettings((prevSettings) => ({ ...prevSettings, perPage: value }));
+  };
 
   const providedValues = { settings, toggleShowCompleted, setPerPage };
 
   return (
     <SettingsContext.Provider value={providedValues}>
-      {props.children}
+      {children}
     </SettingsContext.Provider>
   );
-}
+};
 
-// Add prop validation for 'children'
 SettingsProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
