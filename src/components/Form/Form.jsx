@@ -1,7 +1,5 @@
-// src/components/Form/Form.jsx
-
-import { useState } from 'react';
 import axios from 'axios';
+import { useState } from 'react';
 import '../Form/form.scss';
 
 const Form = () => {
@@ -16,16 +14,24 @@ const Form = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://auth-server-2eag.onrender.com/auth/signin', credentials);
+      const response = await axios.post('https://auth-server-2eag.onrender.com/auth/signin', credentials, {
+        headers: { 'Content-Type': 'application/json' }
+      });
       console.log('User authenticated!', response.data);
-      // Handle successful login (e.g., store token in localStorage, update state, etc.)
-      // For example, assuming your API returns a token:
       localStorage.setItem('token', response.data.token); // Store token in localStorage
-      // Optionally, you can redirect the user or update state to reflect authentication success
     } catch (error) {
       console.error('Sign-in failed:', error);
-      setError('Invalid credentials. Please try again.'); // Display error message to user
-      // Handle error (e.g., show error message to user)
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+        setError(error.response.data.message || 'Invalid credentials. Please try again.');
+      } else if (error.request) {
+        console.error('No response received:', error.request);
+        setError('No response from server. Please try again later.');
+      } else {
+        console.error('Error:', error.message);
+        setError('An error occurred. Please try again.');
+      }
     }
   };
 
@@ -37,6 +43,7 @@ const Form = () => {
         placeholder="Username"
         value={credentials.username}
         onChange={handleChange}
+        required
       />
       <input
         type="password"
@@ -44,8 +51,9 @@ const Form = () => {
         placeholder="Password"
         value={credentials.password}
         onChange={handleChange}
+        required
       />
-      {error && <p className="error">{error}</p>} {/* Display error message if authentication fails */}
+      {error && <p className="error">{error}</p>}
       <button type="submit">Sign In</button>
     </form>
   );
