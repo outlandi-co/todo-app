@@ -1,33 +1,29 @@
-// eslint-disable-next-line no-unused-vars
-import React, { createContext, useState } from 'react';
-import { decode as jwt_decode } from 'jwt-decode'; // eslint-disable-next-line no-unused-vars
+import { createContext, useState } from 'react';
+import PropTypes from 'prop-types';
 import cookie from 'js-cookie';
 
 export const AuthContext = createContext();
 
-// eslint-disable-next-line react/prop-types
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Function to handle login
   const handleLogin = (token) => {
-    const decodedToken = jwt_decode(token);
-    setUser(decodedToken);
+
     setIsLoggedIn(true);
-    cookie.set('token', token, { expires: 1 }); // Example: Store token in cookie
+    cookie.set('token', token, { expires: 1 });
   };
 
   // Function to handle logout
   const handleLogout = () => {
     setUser(null);
     setIsLoggedIn(false);
-    cookie.remove('token'); // Example: Remove token from cookie
+    cookie.remove('token');
   };
 
   // Function to check if user has capability
   const userHasCapability = (capability) => {
-    // Example logic: Check if user has capability based on their role or permissions
     return user && user.capabilities && user.capabilities.includes(capability);
   };
 
@@ -40,6 +36,10 @@ const AuthProvider = ({ children }) => {
   };
 
   return <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>;
+};
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export default AuthProvider;

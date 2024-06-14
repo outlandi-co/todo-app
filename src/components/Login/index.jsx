@@ -1,4 +1,5 @@
 // src/components/Login/index.jsx
+// eslint-disable-next-line no-unused-vars
 import React, { useContext, useState } from 'react';
 import { AuthContext } from '../../context/Auth';
 
@@ -13,8 +14,8 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Simulate login - replace this with actual login logic
-    const token = 'mock-jwt-token';
-    login(token);
+    const token = 'mock-jwt-token'; // Replace with your actual token from backend
+    login(token); // Call login function with token
   };
 
   return (

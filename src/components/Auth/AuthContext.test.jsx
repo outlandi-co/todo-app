@@ -1,7 +1,8 @@
 // src/context/Auth/AuthContext.test.jsx
 import { render, screen } from '@testing-library/react';
-import AuthProvider, { AuthContext } from './index';
+import AuthProvider, { AuthContext } from './AuthProvider';
 
+// eslint-disable-next-line no-undef
 test('provides user context', () => {
   render(
     <AuthProvider>
@@ -13,5 +14,6 @@ test('provides user context', () => {
     </AuthProvider>
   );
 
+  // eslint-disable-next-line no-undef
   expect(screen.getByText('Logged Out')).toBeInTheDocument();
 });

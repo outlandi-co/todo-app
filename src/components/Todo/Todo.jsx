@@ -1,75 +1,64 @@
-// src/components/Todo/Todo.jsx
-import React, { useEffect, useState, useContext } from 'react';
-import { Pagination } from '@mantine/core';
-import useForm from '../../hooks/form';
-import { v4 as uuid } from 'uuid';
-import { SettingsContext } from '../../context/Settings';
-import Header from '../Header/Header';
-import Form from '../Form';
-import List from '../List';
-import Auth from '../Auth';
+import  { useState, useEffect } from 'react';
+import Form from '../Form/Form';
+import axios from 'axios';
 
 const Todo = () => {
-  const context = useContext(SettingsContext);
-  const defaultValues = context.settings;
-
-  const [list, setList] = useState([]);
-  const [displayList, setDisplayList] = useState([]);
-  const [incomplete, setIncomplete] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const { handleChange, handleSubmit } = useForm(addItem, defaultValues);
-
-  function addItem(item) {
-    item.id = uuid();
-    item.complete = false;
-    setList([...list, item]);
-  }
-
-  function deleteItem(id) {
-    const items = list.filter(item => item.id !== id);
-    setList(items);
-  }
-
-  function toggleComplete(id) {
-    const items = list.map(item => {
-      if (item.id === id) {
-        item.complete = !item.complete;
-      }
-      return item;
-    });
-
-    setList(items);
-  }
+  const [todos, setTodos] = useState([]);
+  // eslint-disable-next-line no-unused-vars
+  const [difficulty, setDifficulty] = useState(1); // Initialize difficulty state
 
   useEffect(() => {
-    let filteredList = list.filter(item => {
-      return defaultValues.showCompleted ? true : item.complete === false;
-    });
+    fetchTodos(); // Fetch todos when component mounts
+  }, []);
 
-    let start = defaultValues.perPage * (currentPage - 1);
-    let end = start + defaultValues.perPage;
+  const fetchTodos = async () => {
+    try {
+      const response = await axios.get('https://auth-server-2eag.onrender.com/api/v1/todo');
+      setTodos(response.data); // Update todos state with fetched data
+    } catch (error) {
+      console.error('Error fetching todos:', error); // Log error if fetch fails
+    }
+  };
 
-    setDisplayList(filteredList.slice(start, end));
+  const handleSubmit = async (newTodo) => {
+    try {
+      const response = await axios.post('https://auth-server-2eag.onrender.com/api/v1/todo', newTodo);
+      setTodos([...todos, response.data]); // Update todos state with new todo item
+    } catch (error) {
+      console.error('Error adding todo:', error); // Log error if adding todo fails
+    }
+  };
 
-    let incompleteCount = filteredList.length;
-    setIncomplete(incompleteCount);
+  const handleComplete = async (id) => {
+    try {
+      await axios.put(`https://auth-server-2eag.onrender.com/api/v1/todo/${id}`, { completed: true });
+      const updatedTodos = todos.filter(todo => todo.id !== id); // Filter out completed todo
+      setTodos(updatedTodos); // Update todos state with filtered list
+    } catch (error) {
+      console.error('Error completing todo:', error); // Log error if completing todo fails
+    }
+  };
 
-    document.title = `To Do List: ${incompleteCount}`;
-  }, [list, currentPage, defaultValues]);
-
-  let numPages = Math.ceil(incomplete / defaultValues.perPage);
+  const handleChange = (event) => {
+    // eslint-disable-next-line no-unused-vars
+    const { name, value } = event.target;
+    // Handle form input changes locally if needed
+  };
 
   return (
-    <>
-      <Header openItems={incomplete} />
-      <Auth capability="create">
-        <Form handleChange={handleChange} handleSubmit={handleSubmit} difficulty={defaultValues.difficulty} />
-      </Auth>
-      <Auth capability="read">
-        <List list={displayList} toggleComplete={toggleComplete} deleteItem={deleteItem} />
-      </Auth>
-      <Pagination total={numPages} onChange={setCurrentPage} size="lg" radius="lg" withEdges />
-    </>
+    <div>
+      <h1>Todo List</h1>
+      
+      <Form handleSubmit={handleSubmit} handleChange={handleChange} difficulty={difficulty} /> {/* Pass difficulty to Form */}
+      <ul>
+        {todos.map(todo => (
+          <li key={todo.id}>
+            {todo.text} - {todo.assignee} - Difficulty: {todo.difficulty}
+            {!todo.completed && <button onClick={() => handleComplete(todo.id)}>Complete</button>}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
