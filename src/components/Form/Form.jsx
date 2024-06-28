@@ -1,62 +1,48 @@
-import axios from 'axios';
-import { useState } from 'react';
-import '../Form/form.scss';
+import  { useState } from 'react';
+import PropTypes from 'prop-types';
 
-const Form = () => {
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
+const Form = ({ handleSubmit }) => {
+  const [newTodo, setNewTodo] = useState({ text: '', assignee: '', difficulty: 1 });
 
-  const handleChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
+  const submitForm = (e) => {
     e.preventDefault();
-
-    try {
-      const response = await axios.post('https://auth-server-2eag.onrender.com/auth/signin', credentials, {
-        headers: { 'Content-Type': 'application/json' }
-      });
-      console.log('User authenticated!', response.data);
-      localStorage.setItem('token', response.data.token); // Store token in localStorage
-    } catch (error) {
-      console.error('Sign-in failed:', error);
-      if (error.response) {
-        console.error('Response data:', error.response.data);
-        console.error('Response status:', error.response.status);
-        setError(error.response.data.message || 'Invalid credentials. Please try again.');
-      } else if (error.request) {
-        console.error('No response received:', error.request);
-        setError('No response from server. Please try again later.');
-      } else {
-        console.error('Error:', error.message);
-        setError('An error occurred. Please try again.');
-      }
-    }
+    handleSubmit(newTodo);
+    setNewTodo({ text: '', assignee: '', difficulty: 1 });
   };
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
+    <form onSubmit={submitForm}>
+      <label htmlFor="text">Text:</label>
       <input
         type="text"
-        name="username"
-        placeholder="Username"
-        value={credentials.username}
-        onChange={handleChange}
+        id="text"
+        value={newTodo.text}
+        onChange={(e) => setNewTodo({ ...newTodo, text: e.target.value })}
         required
       />
+      <label htmlFor="assignee">Assignee:</label>
       <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={credentials.password}
-        onChange={handleChange}
+        type="text"
+        id="assignee"
+        value={newTodo.assignee}
+        onChange={(e) => setNewTodo({ ...newTodo, assignee: e.target.value })}
         required
       />
-      {error && <p className="error">{error}</p>}
-      <button type="submit">Sign In</button>
+      <label htmlFor="difficulty">Difficulty:</label>
+      <input
+        type="number"
+        id="difficulty"
+        value={newTodo.difficulty}
+        onChange={(e) => setNewTodo({ ...newTodo, difficulty: parseInt(e.target.value) })}
+        required
+      />
+      <button type="submit">Add Todo</button>
     </form>
   );
+};
+
+Form.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
 };
 
 export default Form;
