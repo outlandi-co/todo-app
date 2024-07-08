@@ -1,11 +1,10 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Form from '../Form/Form';
 import axios from 'axios';
 
 const Todo = () => {
   const [todos, setTodos] = useState([]);
-  // eslint-disable-next-line no-unused-vars
-  const [difficulty, setDifficulty] = useState(1); // Initialize difficulty state
+  const [difficulty] = useState(1); // Remove setDifficulty since it's unused
 
   useEffect(() => {
     fetchTodos(); // Fetch todos when component mounts
@@ -13,7 +12,7 @@ const Todo = () => {
 
   const fetchTodos = async () => {
     try {
-      const response = await axios.get('https://auth-server-2eag.onrender.com/api/v1/todo');
+      const response = await axios.get('https://backend-server-nlr5.onrender.com/api/v1/todo'); // Use the correct base URL
       setTodos(response.data); // Update todos state with fetched data
     } catch (error) {
       console.error('Error fetching todos:', error); // Log error if fetch fails
@@ -22,7 +21,7 @@ const Todo = () => {
 
   const handleSubmit = async (newTodo) => {
     try {
-      const response = await axios.post('https://auth-server-2eag.onrender.com/api/v1/todo', newTodo);
+      const response = await axios.post('https://backend-server-nlr5.onrender.com/api/v1/todo', newTodo); // Use the correct base URL
       setTodos([...todos, response.data]); // Update todos state with new todo item
     } catch (error) {
       console.error('Error adding todo:', error); // Log error if adding todo fails
@@ -31,7 +30,7 @@ const Todo = () => {
 
   const handleComplete = async (id) => {
     try {
-      await axios.put(`https://auth-server-2eag.onrender.com/api/v1/todo/${id}`, { completed: true });
+      await axios.put(`https://backend-server-nlr5.onrender.com/api/v1/todo/${id}`, { completed: true }); // Use the correct base URL
       const updatedTodos = todos.filter(todo => todo.id !== id); // Filter out completed todo
       setTodos(updatedTodos); // Update todos state with filtered list
     } catch (error) {
@@ -39,17 +38,10 @@ const Todo = () => {
     }
   };
 
-  const handleChange = (event) => {
-    // eslint-disable-next-line no-unused-vars
-    const { name, value } = event.target;
-    // Handle form input changes locally if needed
-  };
-
   return (
     <div>
       <h1>Todo List</h1>
-      
-      <Form handleSubmit={handleSubmit} handleChange={handleChange} difficulty={difficulty} /> {/* Pass difficulty to Form */}
+      <Form handleSubmit={handleSubmit} difficulty={difficulty} /> {/* Remove handleChange if not needed */}
       <ul>
         {todos.map(todo => (
           <li key={todo.id}>
