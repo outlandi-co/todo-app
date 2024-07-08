@@ -1,13 +1,30 @@
-import  { useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 const Form = ({ handleSubmit }) => {
   const [newTodo, setNewTodo] = useState({ text: '', assignee: '', difficulty: 1 });
+  const [error, setError] = useState('');
 
-  const submitForm = (e) => {
+  const submitForm = async (e) => {
     e.preventDefault();
-    handleSubmit(newTodo);
-    setNewTodo({ text: '', assignee: '', difficulty: 1 });
+
+    try {
+      // Assuming you have an authentication token stored in localStorage
+      const token = localStorage.getItem('token');
+      const response = await axios.post('https://backend-server-nlr5.onrender.com/todos', newTodo, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Todo added!', response.data);
+      handleSubmit(newTodo); // Pass newTodo to parent component
+      setNewTodo({ text: '', assignee: '', difficulty: 1 }); // Reset form fields after submission
+    } catch (error) {
+      console.error('Failed to add todo:', error);
+      setError('Failed to add todo. Please try again.'); // Display error message to user
+    }
   };
 
   return (
@@ -37,6 +54,7 @@ const Form = ({ handleSubmit }) => {
         required
       />
       <button type="submit">Add Todo</button>
+      {error && <p>{error}</p>}
     </form>
   );
 };
