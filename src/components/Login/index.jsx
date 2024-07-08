@@ -1,34 +1,54 @@
-// src/components/Login/index.jsx
-// eslint-disable-next-line no-unused-vars
-import React, { useContext, useState } from 'react';
+// src/Components/Login/index.jsx
+import { useState, useContext } from 'react';
+import axios from 'axios';
 import { AuthContext } from '../../context/Auth';
+import './form.scss';
 
 const Login = () => {
-  const { login, logout, user } = useContext(AuthContext);
   const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [error, setError] = useState('');
+  const { handleLogin } = useContext(AuthContext);
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate login - replace this with actual login logic
-    const token = 'mock-jwt-token'; // Replace with your actual token from backend
-    login(token); // Call login function with token
+    try {
+      const response = await axios.post('https://backend-server-nlr5.onrender.com/auth/login', credentials, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      handleLogin(response.data.token);
+    } catch (error) {
+      setError('Invalid credentials. Please try again.');
+    }
   };
 
   return (
-    <div>
-      {user ? (
-        <button onClick={logout}>Logout</button>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <input name="username" placeholder="Username" onChange={handleChange} />
-          <input name="password" type="password" placeholder="Password" onChange={handleChange} />
-          <button type="submit">Login</button>
+    <div className="form-container">
+      <div className="form-wrapper">
+        <form className="form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={credentials.username}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={credentials.password}
+            onChange={handleChange}
+            required
+          />
+          {error && <p className="error">{error}</p>}
+          <button type="submit">Sign In</button>
         </form>
-      )}
+      </div>
     </div>
   );
 };

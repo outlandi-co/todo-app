@@ -1,54 +1,66 @@
-// src/components/Form/Form.jsx
-
-import { useState } from 'react';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
-import '../Form/form.scss';
 
-const Form = () => {
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+const Form = ({ handleSubmit }) => {
+  const [newTodo, setNewTodo] = useState({ text: '', assignee: '', difficulty: 1 });
   const [error, setError] = useState('');
 
-  const handleChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
+  const submitForm = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://backend-server-nlr5.onrender.com/auth/signin', credentials);
-      console.log('User authenticated!', response.data);
-      // Handle successful login (e.g., store token in localStorage, update state, etc.)
-      // For example, assuming your API returns a token:
-      localStorage.setItem('token', response.data.token); // Store token in localStorage
-      // Optionally, you can redirect the user or update state to reflect authentication success
+      // Assuming you have an authentication token stored in localStorage
+      const token = localStorage.getItem('token');
+      const response = await axios.post('https://backend-server-nlr5.onrender.com/todos', newTodo, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Todo added!', response.data);
+      handleSubmit(newTodo); // Pass newTodo to parent component
+      setNewTodo({ text: '', assignee: '', difficulty: 1 }); // Reset form fields after submission
     } catch (error) {
-      console.error('Sign-in failed:', error);
-      setError('Invalid credentials. Please try again.'); // Display error message to user
-      // Handle error (e.g., show error message to user)
+      console.error('Failed to add todo:', error);
+      setError('Failed to add todo. Please try again.'); // Display error message to user
     }
   };
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
+    <form onSubmit={submitForm}>
+      <label htmlFor="text">Text:</label>
       <input
         type="text"
-        name="username"
-        placeholder="Username"
-        value={credentials.username}
-        onChange={handleChange}
+        id="text"
+        value={newTodo.text}
+        onChange={(e) => setNewTodo({ ...newTodo, text: e.target.value })}
+        required
       />
+      <label htmlFor="assignee">Assignee:</label>
       <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={credentials.password}
-        onChange={handleChange}
+        type="text"
+        id="assignee"
+        value={newTodo.assignee}
+        onChange={(e) => setNewTodo({ ...newTodo, assignee: e.target.value })}
+        required
       />
-      {error && <p className="error">{error}</p>} {/* Display error message if authentication fails */}
-      <button type="submit">Sign In</button>
+      <label htmlFor="difficulty">Difficulty:</label>
+      <input
+        type="number"
+        id="difficulty"
+        value={newTodo.difficulty}
+        onChange={(e) => setNewTodo({ ...newTodo, difficulty: parseInt(e.target.value) })}
+        required
+      />
+      <button type="submit">Add Todo</button>
+      {error && <p>{error}</p>}
     </form>
   );
+};
+
+Form.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
 };
 
 export default Form;

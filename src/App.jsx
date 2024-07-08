@@ -1,6 +1,10 @@
+// src/App.jsx
+import React from 'react';
 import { useState } from 'react';
+import AuthProvider from './context/Auth';
+import Todo from './components/Todo/Todo';
 
-function App() {
+const App = () => {
   const [credentials, setCredentials] = useState({
     username: '',
     password: ''
@@ -60,44 +64,49 @@ function App() {
 
   return (
     <div className="App">
-      <form onSubmit={handleSignUp}>
-        <input
-          type="text"
-          name="username"
-          value={credentials.username}
-          onChange={handleChange}
-          placeholder="Username"
-        />
-        <input
-          type="password"
-          name="password"
-          value={credentials.password}
-          onChange={handleChange}
-          placeholder="Password"
-        />
-        <button type="submit">Sign Up</button>
-      </form>
+      <AuthProvider>
+        <form onSubmit={handleSignUp}>
+          <input
+            type="text"
+            name="username"
+            value={credentials.username}
+            onChange={handleChange}
+            placeholder="Username"
+          />
+          <input
+            type="password"
+            name="password"
+            value={credentials.password}
+            onChange={handleChange}
+            placeholder="Password"
+          />
+          <button type="submit">Sign Up</button>
+        </form>
 
-      <form onSubmit={handleSignIn}>
-        <input
-          type="text"
-          name="username"
-          value={credentials.username}
-          onChange={handleChange}
-          placeholder="Username"
-        />
-        <input
-          type="password"
-          name="password"
-          value={credentials.password}
-          onChange={handleChange}
-          placeholder="Password"
-        />
-        <button type="submit">Sign In</button>
-      </form>
+        <form onSubmit={handleSignIn}>
+          <input
+            type="text"
+            name="username"
+            value={credentials.username}
+            onChange={handleChange}
+            placeholder="Username"
+          />
+          <input
+            type="password"
+            name="password"
+            value={credentials.password}
+            onChange={handleChange}
+            placeholder="Password"
+          />
+          <button type="submit">Sign In</button>
+        </form>
+
+        <Todo />
+      </AuthProvider>
     </div>
   );
 }
 
 export default App;
+
 
